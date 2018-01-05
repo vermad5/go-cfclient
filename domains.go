@@ -150,6 +150,51 @@ func (c *Client) GetSharedDomainByName(name string) (SharedDomain, error) {
 	return domains[0], nil
 }
 
+func (c *Client) GetPrivateDomainByGuid(guid string) (Domain, error) {
+	requestUrl := fmt.Sprintf("/v2/private_domains/%s", guid)
+	var domainResource DomainResource
+	r := c.NewRequest("GET", requestUrl)
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return Domain{}, errors.Wrap(err, "Error requesting domains")
+	}
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return Domain{}, errors.Wrap(err, "Error reading domains request")
+	}
+
+	err = json.Unmarshal(resBody, &domainResource)
+	if err != nil {
+		return Domain{}, errors.Wrap(err, "Error unmarshaling domains")
+	}
+	domainResource.Entity.Guid = domainResource.Meta.Guid
+	domainResource.Entity.c = c
+	return domainResource.Entity, nil
+}
+
+func (c *Client) GetSharedDomainByGuid(guid string) (SharedDomain, error) {
+	requestUrl := fmt.Sprintf("/v2/shared_domains/%s", guid)
+
+	var domainResource SharedDomainResource
+	r := c.NewRequest("GET", requestUrl)
+	resp, err := c.DoRequest(r)
+	if err != nil {
+		return SharedDomain{}, errors.Wrap(err, "Error requesting domains")
+	}
+	resBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return SharedDomain{}, errors.Wrap(err, "Error reading domains request")
+	}
+
+	err = json.Unmarshal(resBody, &domainResource)
+	if err != nil {
+		return SharedDomain{}, errors.Wrap(err, "Error unmarshaling domains")
+	}
+	domainResource.Entity.Guid = domainResource.Meta.Guid
+	domainResource.Entity.c = c
+	return domainResource.Entity, nil
+}
+
 func (c *Client) CreateDomain(name, orgGuid string) (*Domain, error) {
 	req := c.NewRequest("POST", "/v2/private_domains")
 	req.obj = map[string]interface{}{
