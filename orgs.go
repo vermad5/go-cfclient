@@ -697,3 +697,22 @@ func (c *Client) mergeOrgResource(org OrgResource) Org {
 	org.Entity.c = c
 	return org.Entity
 }
+
+func (c *Client) GetOrgQuotaByOrgName(name string) (OrgQuota, error) {
+	q := url.Values{}
+	q.Set("q", "name:"+name)
+	org, err := c.ListOrgsByQuery(q)
+
+	if len(org) != 1 {
+		return OrgQuota{}, fmt.Errorf("Unable to find org " + name)
+	}
+
+	quota, _ := org[0].Quota()
+	orgQuota, err := c.GetOrgQuotaByName(quota.Name)
+
+	if err != nil {
+		return OrgQuota{}, err
+	}
+
+	return orgQuota, nil
+}
