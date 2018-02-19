@@ -643,20 +643,17 @@ func (c *Client) ListSpaceRoutes(spaceGuid string) ([]Route, error) {
 	return c.fetchRoutes(requestUrl)
 }
 
-func (c *Client) GetSpaceQuotaBySpaceGuid(guid string) (SpaceQuota, error) {
-    space, err := c.GetSpaceByGuid(guid)
-
-    if err != nil {
-        return SpaceQuota{}, fmt.Errorf("Unable to find space with guid" + guid)
-    }
-
-    sq, spaceQuotaErr := space.Quota()
-    if spaceQuotaErr != nil {
-        return SpaceQuota{}, fmt.Errorf("Unable to find space-quota for space with guid" + guid)
-    }
-    if sq == nil {
-        return SpaceQuota{}, nil
-    }
-    return *sq, nil
-} 
-
+func (c *Client) GetSpaceQuotaBySpaceGuid(guid string) (SpaceQuota, error) {
+	space, err := c.GetSpaceByGuid(guid)
+	if err != nil {
+		return SpaceQuota{}, fmt.Errorf("Unable to find space with guid" + guid)
+	}
+	sq, spaceQuotaErr := space.Quota()
+	if spaceQuotaErr != nil {
+		return SpaceQuota{}, fmt.Errorf("Unable to find space-quota for space with guid" + guid)
+	}
+	if sq == nil {
+		return SpaceQuota{}, nil
+	}
+	return *sq, nil
+}
